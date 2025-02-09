@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pygmalion Play</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/blockly_compressed.js"></script>
+    <script type = "text/javascript" src="js/msg/js/es.js"></script>
+    <script type="text/javascript" src="js/core/lib-dialogs.js" ></script>
+    <script type="text/javascript" src="js/core/lib-games.js" ></script>
+    <script type="text/javascript" src="js/core/lib-interface.js" ></script>
+</head>
+<body>
+    <div style="display: none">
+    <span id="Pintor_moveTooltip">Mover el pintor adelante o atras un determinado tamaño</span>
+    <span id="Pintor_moveForward">Mover adelante</span>
+    <span id="Pintor_moveBackward">Mover atras</span>
+
+    <span id="Pintor_turnTooltip">Gira al pintor izquierda o derecha por unos grados especificos</span>
+    <span id="Pintor_turnRight">Girar derecha</span>
+    <span id="Pintor_turnLeft">Girar izquierda</span>
+
+    <span id="Pintor_widthTooltip">Cambiar el ancho del pincel</span>
+    <span id="Pintor_setWidth">Cambiar ancho a</span>
+
+    <span id="Pintor_colourTooltip">Cambiar el color el pincel</span>
+    <span id="Pintor_setColour">Color del pincel </span>
+
+    <span id="Pintor_penTooltip">Subir o bajar el pincel, para parar o empezar a dibujar.</span>
+    <span id="Pintor_penUp">arriba </span>
+    <span id="Pintor_penDown">abajo</span>
+
+    <span id="Pintor_PintorVisibilityTooltip">Visible o invisible</span>
+    <span id="Pintor_hidePintor">ocultar pintor</span>
+    <span id="Pintor_showPintor">mostrar Pintor</span>
+
+    <span id="Pintor_printTooltip">Dibuja texto en la direccion del pintor</span>
+    <span id="Pintor_print">Imprimir</span>
+
+    <span id="Pintor_fontHelpUrl"></span>
+    <span id="Pintor_fontTooltip">Configurar la fuente usada por el bloque imprimirS</span>
+    <span id="Pintor_font">Fuente</span>
+    <span id="Pintor_fontSize">Tamaño Fuente</span>
+    <span id="Pintor_fontNormal">normal</span>
+    <span id="Pintor_fontBold">Negrita</span>
+    <span id="Pintor_fontItalic">italic</span>
+</div>
+    <div id="container-level" class="container-fluid">
+        <div class="row header">
+            <div class="col-xs-3 imagotipo text-center">
+                <img src="img/imagotipo.svg" class="img-responsive">
+            </div>
+            <div class="col-xs-7 text-center">
+                <div id="label-levels">Niveles</div>
+                <div id="levels" style="display: inline-block"></div>
+            </div>
+            <div class="col-xs-2 text-center">
+                <div class="dropdown">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Productos
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                        <li><a href="../lab/lab.html">Laberinto</a></li>
+                        <li><a href="../..">Pygmalion - IDE</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div id="container-app" class="container-fluid">
+            <div id="container-game">
+                <div id="container-canvas">
+                    <div>
+                        <canvas id="scratch" width="400" height="400" style="display: none"></canvas>
+                        <canvas id="answer" width="400" height="400" style="display: none"></canvas>
+                        <canvas id="display" width="400" height="400"></canvas>
+                    </div>
+                    <div id="container-actions">
+                        <div style="float: left">
+                            <button id="runButton" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-play"></span>&nbsp;&nbsp;Ejecutar</button>
+                            <button id="resetButton" class = "btn btn-danger btn-lg" style="display: none"><span class="glyphicon glyphicon-repeat"></span>&nbsp;&nbsp;Reiniciar</button>
+                        </div>
+                        <div id="conatainer-slider" style="float: right">
+                            <svg id="slider" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="150" height="50">
+                                <!-- Slow icon. -->
+                                <clipPath id="slowClipPath">
+                                    <rect width=26 height=12 x=5 y=14 />
+                                </clipPath>
+                                <image xlink:href="img/icons.png" height=42 width=84 x=-21 y=-10 clip-path="url(#slowClipPath)" />
+                                <!-- Fast icon. -->
+                                <clipPath id="fastClipPath">
+                                    <rect width=26 height=16 x=120 y=10 />
+                                </clipPath>
+                                <image xlink:href="img/icons.png" height=42 width=84 x=120 y=-11 clip-path="url(#fastClipPath)" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div id="container-blockly">
+                    <div id="blockly-bar" style="display: none">
+                        <div id="bar-bloques">Bloques</div>
+                        <div id="bar-workspace">
+                            Bloques Usados <span id="blocksUsed-text">0</span>&nbsp;/&nbsp;<span id="maxBlocks-text">0</span>
+                        </div>
+                    </div>
+                    <div id="blockly"></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <img id="modal-img" src="" class="img-responsive">
+                    </div>
+                    <div id="modal-text">
+                        <p style="white-space: initial;"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Continuar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <xml id="toolbox" style="display: none">
+        <category name="Pintor">
+        <block type="pintor_move">
+            <value name="VALUE">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="pintor_turn">
+            <value name="VALUE">
+                <shadow type="math_number">
+                    <field name="NUM">90</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="pintor_width">
+            <value name="WIDTH">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="pintor_pen"></block>
+        <block type="pintor_visibility"></block>
+        <block type="pintor_print">
+            <value name="TEXT">
+                <shadow type="text"></shadow>
+            </value>
+        </block>
+        <block type="pintor_font"></block>
+        </category>
+        <category name="Color">
+        <block type="pintor_colour">
+            <value name="COLOUR">
+                <shadow type="colour_picker"></shadow>
+            </value>
+        </block>
+        <block type="colour_picker"></block>
+        <block type="colour_random"></block>
+        <block type="colour_rgb">
+            <value name="RED">
+                <shadow type="math_number">
+                    <field name="NUM">100</field>
+                </shadow>
+            </value>
+            <value name="GREEN">
+                <shadow type="math_number">
+                    <field name="NUM">50</field>
+                </shadow>
+            </value>
+            <value name="BLUE">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="colour_blend">
+            <value name="COLOUR1">
+                <shadow type="colour_picker">
+                    <field name="COLOUR">#ff0000</field>
+                </shadow>
+            </value>
+            <value name="COLOUR2">
+                <shadow type="colour_picker">
+                    <field name="COLOUR">#3333ff</field>
+                </shadow>
+            </value>
+            <value name="RATIO">
+                <shadow type="math_number">
+                    <field name="NUM">0.5</field>
+                </shadow>
+            </value>
+        </block>
+        </category>
+        <category name="Logica">
+        <block type="controls_if"></block>
+        <block type="logic_compare"></block>
+        <block type="logic_operation"></block>
+        <block type="logic_negate"></block>
+        <block type="logic_boolean"></block>
+        <block type="logic_ternary"></block>
+        </category>
+        <category name="Loops">
+        <block type="controls_repeat_ext">
+            <value name="TIMES">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="controls_whileUntil"></block>
+        <block type="controls_for">
+            <value name="FROM">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+            <value name="TO">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+            <value name="BY">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="controls_flow_statements"></block>
+        </category>
+        <category name="Matematica">
+        <block type="math_number"></block>
+        <block type="math_arithmetic">
+            <value name="A">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+            <value name="B">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_single">
+            <value name="NUM">
+                <shadow type="math_number">
+                    <field name="NUM">9</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_trig">
+            <value name="NUM">
+                <shadow type="math_number">
+                    <field name="NUM">45</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_constant"></block>
+        <block type="math_number_property">
+            <value name="NUMBER_TO_CHECK">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_change">
+            <value name="DELTA">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_round">
+            <value name="NUM">
+                <shadow type="math_number">
+                    <field name="NUM">3.1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_modulo">
+            <value name="DIVIDEND">
+                <shadow type="math_number">
+                    <field name="NUM">64</field>
+                </shadow>
+            </value>
+            <value name="DIVISOR">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_constrain">
+            <value name="VALUE">
+                <shadow type="math_number">
+                    <field name="NUM">50</field>
+                </shadow>
+            </value>
+            <value name="LOW">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+            <value name="HIGH">
+                <shadow type="math_number">
+                    <field name="NUM">100</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_random_int">
+            <value name="FROM">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+            <value name="TO">
+                <shadow type="math_number">
+                    <field name="NUM">100</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_random_float"></block>
+        </category>
+        <sep></sep>
+        <category name="Variables" custom="VARIABLE"></category>
+        <category name="Funciones" custom="PROCEDURE"></category>
+     </xml>
+
+    <script type="text/javascript" src="js/core/acorn_interpreter.js"></script>
+    <script type="text/javascript" src="js/generator/javascript.js"></script>
+    <script type="text/javascript" src="js/generator/javascript/colour.js"></script>
+    <script type="text/javascript" src="js/generator/javascript/lists.js"></script>
+    <script type="text/javascript" src="js/generator/javascript/logic.js"></script>
+    <script type="text/javascript" src="js/generator/javascript/text.js"></script>
+    <script type="text/javascript" src="js/generator/javascript/variables.js"></script>
+    <script type="text/javascript" src="js/generator/javascript/procedures.js"></script>
+    <script type="text/javascript" src="js/generator/javascript/math.js"></script>
+    <script type="text/javascript" src="js/generator/javascript/loops.js"></script>
+    <script type="text/javascript" src="js/blocks/pintor.js"></script>
+    <script type="text/javascript" src="js/blocks/colour.js"></script>
+    <script type="text/javascript" src="js/blocks/lists.js"></script>
+    <script type="text/javascript" src="js/blocks/logic.js"></script>
+    <script type="text/javascript" src="js/blocks/loops.js"></script>
+    <script type="text/javascript" src="js/blocks/math.js"></script>
+    <script type="text/javascript" src="js/blocks/procedures.js"></script>
+    <script type="text/javascript" src="js/blocks/text.js"></script>
+    <script type="text/javascript" src="js/blocks/variables.js"></script>
+    <script type="text/javascript" src="js/blocks/rootblocks.js"></script>
+    <script type="text/javascript" src="js/storageOwn.js"></script>
+    <script type="text/javascript" src="js/declaraciones.js"></script>
+    <script type="text/javascript" src="js/answers.js"></script>
+    <script type="text/javascript" src="js/slider.js"></script>
+    <script type="text/javascript" src="js/blockly.js"></script>
+    <script type="text/javascript" src="js/pintor.js"></script>
+    <script type="text/javascript" src="js/build-template.js"></script>
+
+</body>
+</html>
